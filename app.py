@@ -63,8 +63,9 @@ system_prompt = (
     "- Consejos útiles y mejores prácticas\n"
     "- Posibles errores comunes y cómo evitarlos\n"
     "- Información complementaria relevante del contexto\n"
-    "Si no encuentras la respuesta en el contexto, di que no tienes "
-    "suficiente información.\n\n"
+    "Si no encuentras la respuesta en el contexto, di que no encuentras "
+    "información en la documentación"
+    "Muéstrate siempre cordial, amigable y dispuesto a ayudar."\n\n"
     "Contexto: {context}"
 )
 
