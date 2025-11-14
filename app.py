@@ -7,8 +7,12 @@ import os
 from langchain_pinecone import PineconeVectorStore
 from langchain_openai import OpenAIEmbeddings
 from dotenv import load_dotenv
+from flask import Flask, request, jsonify
 
 # %%
+
+# Inicializar Flask
+app = Flask(__name__)
 
 # 1. Cargar variables de entorno desde .env
 load_dotenv()
@@ -62,13 +66,36 @@ question_answer_chain = create_stuff_documents_chain(llm, prompt)
 rag_chain = create_retrieval_chain(retriever, question_answer_chain)
 
 # %%
-# Hacer una pregunta
-response = rag_chain.invoke({"input": "¿qué errores comunes se presentan al cargar productos?"})
+# API Endpoint
+@app.route('/ask', methods=['POST'])
+def ask_question():
+    try:
+        data = request.get_json()
+        
+        if not data or 'input' not in data:
+            return jsonify({"error": "Se requiere el campo 'input' en el body"}), 400
+        
+        user_input = data['input']
+        
+        # Hacer la pregunta al RAG
+        response = rag_chain.invoke({"input": user_input})
+        
+        # Formatear la respuesta
+        sources = []
+        for i, doc in enumerate(response["context"], 1):
+            sources.append({
+                "fuente": i,
+                "contenido": doc.page_content[:200]
+            })
+        
+        return jsonify({
+            "respuesta": response["answer"],
+            "fuentes": sources
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-# Ver la respuesta
-print("🤖 Respuesta:", response["answer"])
-print("\n📄 Fuentes utilizadas:")
-for i, doc in enumerate(response["context"], 1):
-    print(f"\n--- Fuente {i} ---")
-    print(doc.page_content[:200])
 # %%
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
