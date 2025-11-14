@@ -60,7 +60,7 @@ system_prompt = (
     "Proporciona respuestas completas, incluyendo:\n"
     "- Descripción clara del funcionamiento sobre el que se consulta \n"
     "- Pasos específicos y ordenados cuando sea aplicable\n"
-    "Si no encuentras la respuesta en el contexto, di que no encuentras "
+    "No inventes nada. Si no encuentras la respuesta en el contexto, di que no encuentras "
     "información en la documentación. "
     "Muéstrate siempre cordial, amigable y dispuesto a ayudar.\n\n"
     "Contexto: {context}"
