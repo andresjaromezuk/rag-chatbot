@@ -41,14 +41,14 @@ def get_retriever_by_marca(marca):
     
     return vectorstore.as_retriever(
         search_type="similarity",
-        search_kwargs={"k": 3}
+        search_kwargs={"k": 5}
     )
 
 # %%
 # Inicializar el modelo
 llm = ChatOpenAI(
     model="gpt-4o-mini",  # o "gpt-4o" si quieres el más potente
-    temperature=0  # Aumentado para respuestas más elaboradas
+    temperature=0.2  # Aumentado para respuestas más elaboradas
 )
 
 
