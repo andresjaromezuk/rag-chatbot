@@ -31,14 +31,14 @@ vectorstore = PineconeVectorStore.from_existing_index(
 # 3. Crear el retriever (esto es lo que consulta Pinecone)
 retriever = vectorstore.as_retriever(
     search_type="similarity",
-    search_kwargs={"k": 3}
+    search_kwargs={"k": 10}
 )
 
 # %%
 # Inicializar el modelo
 llm = ChatOpenAI(
     model="gpt-4o-mini",  # o "gpt-4o" si quieres el más potente
-    temperature=0  # 0 para respuestas más determinísticas
+    temperature=0.3  # Aumentado para respuestas más elaboradas
 )
 
 
@@ -47,6 +47,12 @@ llm = ChatOpenAI(
 system_prompt = (
     "Eres un asistente experto que responde preguntas basándote "
     "únicamente en el contexto proporcionado. "
+    "Proporciona respuestas detalladas y completas, incluyendo:\n"
+    "- Pasos específicos y ordenados cuando sea aplicable\n"
+    "- Explicaciones adicionales sobre el proceso\n"
+    "- Consejos útiles y mejores prácticas\n"
+    "- Posibles errores comunes y cómo evitarlos\n"
+    "- Información complementaria relevante del contexto\n"
     "Si no encuentras la respuesta en el contexto, di que no tienes "
     "suficiente información.\n\n"
     "Contexto: {context}"
