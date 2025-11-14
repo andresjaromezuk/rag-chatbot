@@ -21,18 +21,28 @@ load_dotenv()
 os.environ["PINECONE_API_KEY"] = os.getenv("PINECONE_API_KEY")
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
-# 2. Conectar a Pinecone (aquí se conecta a la base de datos vectorial)
+# 2. Configurar embeddings (se conectará dinámicamente)
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-vectorstore = PineconeVectorStore.from_existing_index(
-    index_name="document-index",  # tu índice en Pinecone
-    embedding=embeddings
-)
 
-# 3. Crear el retriever (esto es lo que consulta Pinecone)
-retriever = vectorstore.as_retriever(
-    search_type="similarity",
-    search_kwargs={"k": 10}
-)
+# 3. Función para obtener retriever según marca
+def get_retriever_by_marca(marca):
+    if marca.lower() == "vtex":
+        index_name = "vtex-index"
+    elif marca.lower() == "hermes":
+        index_name = "document-index"
+    else:
+        # Por defecto usar hermes
+        index_name = "document-index"
+    
+    vectorstore = PineconeVectorStore.from_existing_index(
+        index_name=index_name,
+        embedding=embeddings
+    )
+    
+    return vectorstore.as_retriever(
+        search_type="similarity",
+        search_kwargs={"k": 10}
+    )
 
 # %%
 # Inicializar el modelo
@@ -68,9 +78,6 @@ prompt = ChatPromptTemplate.from_messages([
 # Esta cadena toma los documentos recuperados y los procesa con el LLM
 question_answer_chain = create_stuff_documents_chain(llm, prompt)
 
-# Esta cadena conecta el retriever con el LLM
-rag_chain = create_retrieval_chain(retriever, question_answer_chain)
-
 @app.route('/', methods=['GET'])
 def health_check():
     return jsonify({"status": "ok", "message": "API funcionando"})
@@ -85,7 +92,14 @@ def ask_question():
             return jsonify({"error": "Se requiere el campo 'input' en el body"}), 400
         
         user_input = data['input']
+        marca = data.get('marca', 'hermes')  # Por defecto hermes
         
+        # Obtener retriever según la marca
+        retriever = get_retriever_by_marca(marca)
+        
+        # Crear cadena RAG con el retriever específico
+        rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+        print(marca)
         # Hacer la pregunta al RAG
         response = rag_chain.invoke({"input": user_input})
         
@@ -98,6 +112,8 @@ def ask_question():
             })
         
         return jsonify({
+            "marca": marca,
+            "index_usado": "vtex-index" if marca.lower() == "vtex" else "document-index",
             "respuesta": response["answer"],
             "fuentes": sources
         })
