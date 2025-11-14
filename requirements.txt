@@ -1,5 +1,6 @@
 Flask
 langchain
+langchain-chains
 langchain-openai
 langchain-pinecone
 langchain-community
