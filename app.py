@@ -33,7 +33,7 @@ def get_retriever_by_marca(marca):
     else:
         # Por defecto usar hermes
         index_name = "document-index"
-    
+    print(index_name)
     vectorstore = PineconeVectorStore.from_existing_index(
         index_name=index_name,
         embedding=embeddings
@@ -41,14 +41,14 @@ def get_retriever_by_marca(marca):
     
     return vectorstore.as_retriever(
         search_type="similarity",
-        search_kwargs={"k": 2}
+        search_kwargs={"k": 3}
     )
 
 # %%
 # Inicializar el modelo
 llm = ChatOpenAI(
     model="gpt-4o-mini",  # o "gpt-4o" si quieres el más potente
-    temperature=0.1  # Aumentado para respuestas más elaboradas
+    temperature=0  # Aumentado para respuestas más elaboradas
 )
 
 
@@ -108,7 +108,7 @@ def ask_question():
                 "fuente": i,
                 "contenido": doc.page_content[:200]
             })
-        
+        print
         return jsonify({
             "marca": marca,
             "index_usado": "vtex-index" if marca.lower() == "vtex" else "document-index",
