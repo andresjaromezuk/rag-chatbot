@@ -64,8 +64,8 @@ system_prompt = (
     "- Posibles errores comunes y cómo evitarlos\n"
     "- Información complementaria relevante del contexto\n"
     "Si no encuentras la respuesta en el contexto, di que no encuentras "
-    "información en la documentación"
-    "Muéstrate siempre cordial, amigable y dispuesto a ayudar."\n\n"
+    "información en la documentación. "
+    "Muéstrate siempre cordial, amigable y dispuesto a ayudar.\n\n"
     "Contexto: {context}"
 )
 
