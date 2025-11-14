@@ -71,6 +71,9 @@ question_answer_chain = create_stuff_documents_chain(llm, prompt)
 # Esta cadena conecta el retriever con el LLM
 rag_chain = create_retrieval_chain(retriever, question_answer_chain)
 
+@app.route('/', methods=['GET'])
+def health_check():
+    return jsonify({"status": "ok", "message": "API funcionando"})
 # %%
 # API Endpoint
 @app.route('/ask', methods=['POST'])
@@ -104,4 +107,7 @@ def ask_question():
 
 # %%
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    #app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 8000))
+    # Si usas Flask:
+    app.run(host="0.0.0.0", port=port)
